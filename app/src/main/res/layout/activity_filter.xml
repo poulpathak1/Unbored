@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.home.FilterActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:text="Type : "
+        android:id="@+id/typeLabel"
+        />
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/typeLabel"
+        android:text="Enter Type"
+        android:id="@+id/typeET"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/typeET"
+        app:layout_constraintStart_toStartOf="parent"
+        android:text="Participants : "
+        android:id="@+id/participantsLabel"
+        />
+
+    <EditText
+        android:id="@+id/participantsET"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:text="Enter participants"
+        app:layout_constraintStart_toEndOf="@id/participantsLabel"
+        app:layout_constraintTop_toBottomOf="@id/typeET" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/participantsET"
+        app:layout_constraintStart_toStartOf="parent"
+        android:text="Price : "
+        android:id="@+id/priceLabel"
+        />
+
+    <EditText
+        android:id="@+id/priceET"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:text="Enter Price"
+        app:layout_constraintStart_toEndOf="@id/priceLabel"
+        app:layout_constraintTop_toBottomOf="@id/participantsET" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/priceET"
+        app:layout_constraintStart_toStartOf="parent"
+        android:text="Accessibility : "
+        android:id="@+id/accessibilityLabel"
+        />
+
+    <EditText
+        android:id="@+id/accessibilityET"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:text="Enter Accessibility"
+        app:layout_constraintStart_toEndOf="@id/accessibilityLabel"
+        app:layout_constraintTop_toBottomOf="@+id/priceET" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/accessibilityET"
+        android:text="Save"
+        android:id="@+id/saveBut" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@+id/saveBut"
+        app:layout_constraintTop_toBottomOf="@id/accessibilityET"
+        android:text="Cancel"
+        android:id="@+id/cancelBut" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
