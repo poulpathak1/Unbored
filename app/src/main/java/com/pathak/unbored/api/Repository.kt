@@ -6,12 +6,17 @@ class Repository(private val api: BoredApi) {
 
     suspend fun getActivityFiltered(
         type: String,
-        participants: Int,
-        price: Double,
-        accessibility: Double
-    ) = api.getActivityFiltered(
+        participants: Float,
+        minprice: Float,
+        maxprice: Float,
+        minaccessibility: Float,
+        maxaccessibility: Float
+        ) = api.getActivityFiltered(
         type,
         participants.toString(),
-        price.toString(),
-        accessibility.toString())
+        minprice.toString(),
+        maxprice.toString(),
+        minaccessibility.toString(),
+        maxaccessibility.toString()
+        )
 }

@@ -8,13 +8,13 @@ data class BoredActivity(
     @SerializedName("type")
     val type: String,
     @SerializedName("participants")
-    val participants: Int,
+    val participants: Float,
     @SerializedName("price")
-    val price: Double,
+    val price: Float,
     @SerializedName("link")
     val link: String,
     @SerializedName("key")
-    val key: Int,
+    val key: String,
     @SerializedName("accessibility")
-    val accessibility: Double
+    val accessibility: Float
 )

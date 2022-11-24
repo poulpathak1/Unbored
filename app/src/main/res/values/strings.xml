@@ -4,4 +4,21 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_profile">Profile</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    
+    <string-array name="typeList">
+        <item>education</item>
+        <item>recreational</item>
+        <item>social</item>
+        <item>diy</item>
+        <item>charity</item>
+        <item>cooking</item>
+        <item>relaxation</item>
+        <item>music</item>
+        <item>busywork</item>
+    </string-array>
+
+    <array name="initial_range_slider_values">
+        <item>0.0</item>
+        <item>1.0</item>
+    </array>
 </resources>

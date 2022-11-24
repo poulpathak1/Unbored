@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: "kotlinx-serialization"
 apply plugin: 'kotlin-android'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 32
@@ -44,6 +45,14 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2"
     implementation 'androidx.navigation:navigation-fragment-ktx:2.2.0-alpha01'
     implementation 'androidx.navigation:navigation-ui-ktx:2.2.0-alpha01'
+    implementation 'com.google.firebase:firebase-auth-ktx:21.1.0'
+
+    //
+    implementation 'com.firebaseui:firebase-ui-auth:7.2.0'
+    //implementation 'com.daprlabs.aaron:cardstack:0.3.1-beta0'
+
+
+
     // https://developer.android.com/jetpack/androidx/releases/lifecycle
     def lifecycle_version = "2.5.1"
     // ViewModel

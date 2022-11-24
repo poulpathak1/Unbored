@@ -10,7 +10,6 @@ import com.pathak.unbored.api.BoredApi
 import com.pathak.unbored.api.Repository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlin.math.log
 
 class HomeViewModel : ViewModel() {
 
@@ -24,9 +23,14 @@ class HomeViewModel : ViewModel() {
     private val boredActivity = MutableLiveData<BoredActivity>()
 
     private val type = MutableLiveData<String>()
-    private val participants = MutableLiveData<Int>()
-    private val price = MutableLiveData<Double>()
-    private val accessibility = MutableLiveData<Double>()
+    private val participants = MutableLiveData<Float>()
+    private val price = MutableLiveData<Float>()
+    private val maxPrice = MutableLiveData<Float>()
+    private val minPrice = MutableLiveData<Float>()
+    private val accessibility = MutableLiveData<Float>()
+    private val maxAccessibility = MutableLiveData<Float>()
+    private val minAccessibility = MutableLiveData<Float>()
+
 
     init {
         netRefresh()
@@ -49,12 +53,21 @@ class HomeViewModel : ViewModel() {
             context = viewModelScope.coroutineContext
                     + Dispatchers.IO) {
             boredActivity.postValue(repository.getActivityFiltered(
-                type.value.toString(),
-                participants.value?.toInt() ?: 1,
-                price.value?.toDouble() ?: 0.0,
-                accessibility.value?.toDouble() ?: 0.0
+                type.value ?: "social",
+                participants.value ?: 1.0f,
+                minPrice.value ?: 0.0f,
+                maxPrice.value ?: 1.0f,
+                minAccessibility.value ?: 0.0f,
+                maxAccessibility.value ?: 1.0f
             ))
         }
+    }
+
+    fun updateAttributes(){
+        setType(boredActivity.value?.type ?: "social")
+        setParticipants(boredActivity.value?.participants ?: 1.0f)
+        setPrice(boredActivity.value?.price ?: 0.0f)
+        setAccessibility(boredActivity.value?.accessibility ?: 0.0f)
     }
 
     fun observeBoredActivity(): LiveData<BoredActivity> {
@@ -63,32 +76,58 @@ class HomeViewModel : ViewModel() {
 
     fun setType(type: String){
         this.type.value = type
-
     }
     fun observeType(): LiveData<String> {
         return type
     }
 
-    fun setParticipants(participants: Int) {
+    fun setParticipants(participants: Float) {
         this.participants.value = participants
     }
-    fun observeParticipants(): LiveData<Int> {
+    fun observeParticipants(): LiveData<Float> {
         return participants
     }
 
-    fun setPrice(price: Double) {
+    fun setPrice(price: Float) {
         this.price.value = price
     }
-    fun observePrice(): LiveData<Double> {
+    fun observePrice(): LiveData<Float> {
         return price
     }
+    fun setMinPrice(price: Float) {
+        this.minPrice.value = price
+    }
+    fun observeMinPrice(): LiveData<Float> {
+        return minPrice
+    }
+    fun setMaxPrice(price: Float) {
+        this.maxPrice.value = price
+    }
+    fun observeMaxPrice(): LiveData<Float> {
+        return maxPrice
+    }
 
-    fun setAccessibility(accessibility: Double) {
+
+    fun setAccessibility(accessibility: Float) {
         this.accessibility.value = accessibility
     }
-    fun observeAccessibility(): LiveData<Double> {
+    fun observeAccessibility(): LiveData<Float> {
         return accessibility
     }
+    fun setMinAccessibility(accessibility: Float) {
+        this.minAccessibility.value = accessibility
+    }
+    fun observeMinAccessibility(): LiveData<Float> {
+        return minAccessibility
+    }
+
+    fun setMaxAccessibility(accessibility: Float) {
+        this.maxAccessibility.value = accessibility
+    }
+    fun observeMaxAccessibility(): LiveData<Float> {
+        return maxAccessibility
+    }
+
 
 
 }

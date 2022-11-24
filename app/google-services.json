@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "76397817543",
+    "project_id": "unbored-b99b9",
+    "storage_bucket": "unbored-b99b9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:76397817543:android:c2c665e0e895ca411e18e2",
+        "android_client_info": {
+          "package_name": "com.pathak.unbored"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "76397817543-o4bab77p5c9qpfhd95r4kgnghmp74fq2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIvXkdr3QJx36ZjKVGhykr956h7C2tn64"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "76397817543-o4bab77p5c9qpfhd95r4kgnghmp74fq2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

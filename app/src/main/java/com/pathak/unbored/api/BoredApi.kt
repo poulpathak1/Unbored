@@ -17,9 +17,11 @@ interface BoredApi {
     suspend fun getActivityFiltered(
         @Query("type") type: String,
         @Query("participants") participants: String,
-        @Query("price") price: String,
-        @Query("accessibility") accessibility: String
-    ) : BoredActivity
+        @Query("minprice") minprice: String,
+        @Query("maxprice") maxprice: String,
+        @Query("minaccessibility") minaccessibility: String,
+        @Query("maxaccessibility") maxaccessibility: String,
+        ) : BoredActivity
 
     //data class BoredResponse(val result: BoredActivity)
 

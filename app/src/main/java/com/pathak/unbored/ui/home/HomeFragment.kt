@@ -7,11 +7,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.pathak.unbored.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
@@ -32,23 +32,31 @@ class HomeFragment : Fragment() {
                 val data: Intent? = result.data
                 data?.extras?.apply {
                     getString(FilterActivity.typeKey)?.let {
+                        Log.d("XXX", "type: $it ")
                         homeViewModel.setType(it) }
-                    getString(FilterActivity.participantsKey)?.let {
-                        homeViewModel.setParticipants(
-                            it.toInt())
+                    getFloat(FilterActivity.participantsKey)?.let {
+                        Log.d("XXX", "participants: $it ")
+                        homeViewModel.setParticipants(it)
                     }
-                    getString(FilterActivity.priceKey)?.let {
-                        homeViewModel.setPrice(
-                            it.toDouble())
+                    getFloat(FilterActivity.minPriceKey)?.let {
+                        Log.d("XXX", "minPrice: $it ")
+                        homeViewModel.setMinPrice(it)
                     }
-                    getString(FilterActivity.accessibilityKey)?.let {
-                        homeViewModel.setAccessibility(
-                            it.toDouble())
+                    getFloat(FilterActivity.maxPriceKey)?.let {
+                        Log.d("XXX", "maxPrice: $it ")
+                        homeViewModel.setMaxPrice(it)
+                    }
+                    getFloat(FilterActivity.minAccessibilityKey)?.let {
+                        Log.d("XXX", "minAxx: $it ")
+                        homeViewModel.setMinAccessibility(it)
+                    }
+                    getFloat(FilterActivity.maxAccessibilityKey)?.let {
+                        Log.d("XXX", "maxAxx: $it ")
+                        homeViewModel.setMaxAccessibility(it)
                     }
                 }
 
                 homeViewModel.filterActivity()
-                //EEE // XXX Write me
             } else {
                 Log.w(javaClass.simpleName, "Bad activity return code ${result.resultCode}")
             }
@@ -68,29 +76,49 @@ class HomeFragment : Fragment() {
 //        homeViewModel.text.observe(viewLifecycleOwner) {
 //            textView.text = it
 //        }
+       // val boredActivity = homeViewModel.observeBoredActivity().value
 
-        binding.filterButton.setOnClickListener {
-            doFilter()
-        }
-
-        homeViewModel.observeBoredActivity().observe(viewLifecycleOwner) {
-            binding.textHome.text = homeViewModel.observeBoredActivity().value?.activity ?: "No results found"
-        }
         return binding.root
     }
 
     private fun doFilter() {
         val getFilterIntent = Intent(context, FilterActivity::class.java)
 
-        val boredActivity = homeViewModel.observeBoredActivity().value
+        getFilterIntent.putExtra(FilterActivity.typeKey, homeViewModel.observeType().value ?: "social")
+        getFilterIntent.putExtra(FilterActivity.participantsKey, homeViewModel.observeParticipants().value?.toFloat() ?: 1.0f)
+        getFilterIntent.putExtra(FilterActivity.minPriceKey, homeViewModel.observeMinPrice().value ?: 0.0f)
+        getFilterIntent.putExtra(FilterActivity.maxPriceKey, homeViewModel.observeMaxPrice().value ?: 1.0f)
+        getFilterIntent.putExtra(FilterActivity.minAccessibilityKey,homeViewModel.observeMinAccessibility().value ?: 0.0f)
+        getFilterIntent.putExtra(FilterActivity.maxAccessibilityKey,homeViewModel.observeMaxAccessibility().value ?: 1.0f)
 
-        getFilterIntent.putExtra(FilterActivity.typeKey, boredActivity?.type)
-        getFilterIntent.putExtra(FilterActivity.participantsKey, boredActivity?.participants.toString())
-        getFilterIntent.putExtra(FilterActivity.priceKey, boredActivity?.price.toString())
-        getFilterIntent.putExtra(FilterActivity.accessibilityKey, boredActivity?.accessibility.toString())
-
+        getFilterIntent.putExtra(FilterActivity.priceKey, homeViewModel.observePrice().value ?: 0.0f)
+        getFilterIntent.putExtra(FilterActivity.accessibilityKey, homeViewModel.observeAccessibility().value ?: 0.0f)
         resultLauncher.launch(getFilterIntent)
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        (requireActivity() as AppCompatActivity).supportActionBar?.title = "Activity"
+
+
+        binding.filterButton.setOnClickListener {
+            doFilter()
+        }
+
+        homeViewModel.observeBoredActivity().observe(viewLifecycleOwner) {
+            binding.textHome.text = it.activity
+            if (it.activity.isNullOrBlank()) binding.textHome.text = "No results found!"
+            //homeViewModel.updateAttributes()
+        }
+
+        binding.cancelBut.setOnClickListener {
+            homeViewModel.filterActivity()
+        }
+
+
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
