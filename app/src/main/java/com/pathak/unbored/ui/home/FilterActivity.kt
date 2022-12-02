@@ -31,6 +31,8 @@ class FilterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_filter)
 
+        supportActionBar?.title = "Filter Activity"
+
         filterLayout = ActivityFilterBinding.inflate(layoutInflater)
         setContentView(filterLayout.root)
 

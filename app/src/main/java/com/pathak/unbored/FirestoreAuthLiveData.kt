@@ -1,5 +1,5 @@
 package com.pathak.unbored
-
+import android.util.Log
 import androidx.lifecycle.LiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -14,6 +14,7 @@ class FirestoreAuthLiveData : LiveData<FirebaseUser?>() {
         value = firebaseAuth.currentUser
     }
     fun getCurrentUser() : FirebaseUser? {
+        Log.d("PPP", "getCurrentUser: ${firebaseAuth.currentUser}")
         return firebaseAuth.currentUser
     }
     override fun onActive() {

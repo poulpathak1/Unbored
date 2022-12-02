@@ -1,0 +1,13 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+
+<!--    <item android:id="@+id/action_login"-->
+<!--        android:title="Login"-->
+<!--        app:showAsAction="never"/>-->
+
+    <item android:id="@+id/action_signOut"
+        android:title="SignOut"
+        app:showAsAction="never"/>
+</menu>

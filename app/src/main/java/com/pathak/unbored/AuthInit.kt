@@ -19,15 +19,20 @@ class AuthInit(viewModel: MainViewModel, signInLauncher: ActivityResultLauncher<
             Log.d(TAG, "XXX user null")
             // Choose authentication providers
             val providers = arrayListOf(
-                AuthUI.IdpConfig.EmailBuilder().build())
+                AuthUI.IdpConfig.EmailBuilder().build(),
+                AuthUI.IdpConfig.GoogleBuilder().build(),
+                AuthUI.IdpConfig.AnonymousBuilder().build()
+            )
 
             // Create and launch sign-in intent
             // XXX Write me. Set authentication providers and start sign-in for user
             // setIsSmartLockEnabled(false) solves some problems
             val signInIntent = AuthUI.getInstance()
                 .createSignInIntentBuilder()
+                .enableAnonymousUsersAutoUpgrade()
                 .setAvailableProviders(providers)
                 .setIsSmartLockEnabled(false)
+                .setLogo(R.drawable.ic_baseline_check_circle_24)
                 .build()
             signInLauncher.launch(signInIntent)
         } else {

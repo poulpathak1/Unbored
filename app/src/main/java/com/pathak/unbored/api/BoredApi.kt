@@ -23,6 +23,9 @@ interface BoredApi {
         @Query("maxaccessibility") maxaccessibility: String,
         ) : BoredActivity
 
+    @GET("api/activity?")
+    suspend fun getActivityByKey(@Query("key") key: String): BoredActivity
+
     //data class BoredResponse(val result: BoredActivity)
 
     companion object {

@@ -4,6 +4,8 @@ class Repository(private val api: BoredApi) {
 
     suspend fun getActivity() = api.getActivity()
 
+    suspend fun getActivityByKey(key: String) = api.getActivityByKey(key)
+
     suspend fun getActivityFiltered(
         type: String,
         participants: Float,

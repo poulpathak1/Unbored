@@ -1,10 +1,12 @@
 package com.pathak.unbored.ui.home
 
 import android.util.Log
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pathak.unbored.MainViewModel
 import com.pathak.unbored.api.BoredActivity
 import com.pathak.unbored.api.BoredApi
 import com.pathak.unbored.api.Repository
@@ -12,11 +14,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class HomeViewModel : ViewModel() {
-
-//    private val _text = MutableLiveData<String>().apply {
-//        value = "This is home Fragment"
-//    }
-//    val text: LiveData<String> = _text
 
     private val boredApi = BoredApi.create()
     private val repository = Repository(boredApi)
@@ -30,7 +27,7 @@ class HomeViewModel : ViewModel() {
     private val accessibility = MutableLiveData<Float>()
     private val maxAccessibility = MutableLiveData<Float>()
     private val minAccessibility = MutableLiveData<Float>()
-
+    private val isFavorite = MutableLiveData<Boolean>()
 
     init {
         netRefresh()
@@ -128,6 +125,12 @@ class HomeViewModel : ViewModel() {
         return maxAccessibility
     }
 
+    fun setIsFavorite(favoriteStatus: Boolean) {
+        this.isFavorite.postValue(favoriteStatus)
+    }
+    fun observeIsFavorite(): MutableLiveData<Boolean> {
+        return isFavorite
+    }
 
 
 }
