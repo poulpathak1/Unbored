@@ -1,8 +1,10 @@
 package com.pathak.unbored
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
 class ViewModelDBHelper() {
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -11,6 +13,7 @@ class ViewModelDBHelper() {
     private val favActivityList = "favActivityList"
     private val acceptedActivityList = "acceptedActivityList"
     private val totalCompletedByUser = "totalCompletedByUser"
+    private val userNameKey = "userName"
     private val scoresDocument = "scores"
     private var firebaseAuthLiveData = FirestoreAuthLiveData()
     private val cu = firebaseAuthLiveData.getCurrentUser()
@@ -18,6 +21,57 @@ class ViewModelDBHelper() {
     fun addToLeaderBoard(userName: String, score: Number) {
         db.collection(leaderboardCollection).document()
     }
+
+    fun addUserName(userName: String) {
+        if (cu != null) {
+
+            db.collection(rootCollection).document(cu.uid).update(
+                userNameKey, cu.displayName
+            )
+                .addOnSuccessListener {
+
+                }
+                .addOnFailureListener {
+                    val setUserName = mapOf(Pair(userNameKey, cu.displayName))
+                    db.collection(rootCollection).document(cu.uid).set(setUserName)
+                }
+        }
+    }
+
+    fun load(leaderboardList: MutableLiveData<MutableList<String>>) {
+        val scoreField: String = totalCompletedByUser
+        val userNameField: String = userNameKey
+        val transfer: MutableList<String> = mutableListOf()
+        db.collection(rootCollection)
+            .orderBy(scoreField, Query.Direction.DESCENDING)
+            .whereGreaterThan(scoreField, 0)
+            .get()
+            .addOnSuccessListener {
+                it.documents.mapNotNull {
+                    //it.toObject(PhotoMeta::class.java)
+                    val result = it
+
+                    var userName: String
+                    var userNameRaw = result.get(userNameField)
+                    if (userNameRaw == null){
+                        userName = "Anonymous User"
+                    }
+                    else {
+                        userName = userNameRaw as String
+                    }
+                    var score = result.get(scoreField) as Long
+                    var x = "$userName : $score"
+                    transfer.add(x)
+                    leaderboardList.postValue(transfer)
+                }
+            }
+            .addOnFailureListener {
+                Log.d("DDD", "load: failed", it)
+            }
+
+    }
+
+
 
     fun addFavorite(activityKey: String) {
         if (cu != null) {
@@ -47,6 +101,25 @@ class ViewModelDBHelper() {
             .update(favActivityList, favoritesList.value)
     }
 
+
+    fun fetchFavorites(favoritesList: MutableLiveData<MutableList<String>>) {
+        var x: MutableList<String> = arrayListOf()
+        cu?.let {
+            db.collection(rootCollection).document(it.uid)
+                .get()
+                .addOnSuccessListener {
+                    val result = it.data?.get(favActivityList)
+                    if (result != null) {
+                        x = result as MutableList<String>
+                    }
+                    favoritesList.postValue(x)
+                }
+                .addOnFailureListener {
+
+                }
+        }
+    }
+
     fun addAccepted(activityKey: String) {
         if (cu == null) {
             //Log.d("PPP", "cu is Null")
@@ -74,23 +147,6 @@ class ViewModelDBHelper() {
     }
 
 
-    fun fetchFavorites(favoritesList: MutableLiveData<MutableList<String>>) {
-        var x: MutableList<String> = arrayListOf()
-        cu?.let {
-            db.collection(rootCollection).document(it.uid)
-                .get()
-                .addOnSuccessListener {
-                    val result = it.data?.get(favActivityList)
-                    if (result != null) {
-                        x = result as MutableList<String>
-                    }
-                    favoritesList.postValue(x)
-                }
-                .addOnFailureListener {
-
-                }
-        }
-    }
 
     fun fetchAccepted(acceptedList: MutableLiveData<MutableList<String>>) {
         var x: MutableList<String> = arrayListOf()

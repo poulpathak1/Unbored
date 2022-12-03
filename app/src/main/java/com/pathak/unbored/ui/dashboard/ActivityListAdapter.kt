@@ -49,19 +49,22 @@ class ActivityListAdapter(private val mainViewModel: MainViewModel, fragmentActi
                 rowActivityBinding.acceptBut.setImageResource(R.drawable.ic_baseline_move_24)
                 rowActivityBinding.cancelBut.setImageResource(R.drawable.ic_baseline_cancel_24)
                 rowActivityBinding.acceptBut.setOnClickListener {
-                    mainViewModel.addAccepted(boredActivityKey)
-                    mainViewModel.removeFavorite(boredActivityKey)
-                    notifyDataSetChanged()
+                    if(mainViewModel.observeAcceptedList().value?.size ?: 0 < 3){
+                        mainViewModel.addAccepted(boredActivityKey)
+                        mainViewModel.removeFavorite(boredActivityKey)
+                        notifyDataSetChanged()
+                    } else {
+                        Snackbar.make(itemView, "Please complete other activities on backlog",
+                            Snackbar.LENGTH_SHORT).show()
+                    }
+
                 }
                 rowActivityBinding.cancelBut.setOnClickListener {
                     mainViewModel.removeFavorite(boredActivityKey)
                     notifyDataSetChanged()
                 }
             }
-
-
         }
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {

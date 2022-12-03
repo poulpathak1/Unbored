@@ -7,12 +7,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import com.google.android.material.snackbar.Snackbar
 import com.pathak.unbored.FirestoreAuthLiveData
 import com.pathak.unbored.MainViewModel
 import com.pathak.unbored.R
@@ -132,12 +132,12 @@ class HomeFragment : Fragment() {
             val activityKey = homeViewModel.observeBoredActivity().value?.activity
             val currentUser = firebaseAuthLiveData.getCurrentUser()
             if (currentUser == null) {
-                Snackbar.make(view, "Please Login to start", Snackbar.LENGTH_SHORT).show()
+                Toast.makeText(context, "Please Login to start", Toast.LENGTH_SHORT).show()
             }
-            else if (((mainViewModel.acceptedList.value?.size ?: 0) < 3) && activityKey != null) {
+            else if ((mainViewModel.observeAcceptedList().value?.size ?: 0 < 3) && activityKey != null) {
                 mainViewModel.addAccepted(activityKey)
-                Snackbar.make(view, "New activity has been added to Activity Backlog",
-                    Snackbar.LENGTH_SHORT).show()
+                Toast.makeText(context, "New activity has been added to Activity Backlog",
+                    Toast.LENGTH_SHORT).show()
                 if (binding.filterSwitch.isChecked){
                     homeViewModel.filterActivity()
                 }
@@ -146,8 +146,8 @@ class HomeFragment : Fragment() {
                 }
             }
             else {
-                Snackbar.make(view, "Complete an activity from Dashboard first!",
-                    Snackbar.LENGTH_SHORT).show()
+                Toast.makeText(context, "Complete an activity from Dashboard first!",
+                    Toast.LENGTH_SHORT).show()
             }
         }
         binding.favoriteBut.setOnClickListener {

@@ -15,13 +15,13 @@ class MainViewModel: ViewModel() {
     private val dbHelp = ViewModelDBHelper()
     val favoritesList = MutableLiveData<MutableList<String>>()
     val acceptedList = MutableLiveData<MutableList<String>>()
+    val leaderboardList = MutableLiveData<MutableList<String>>()
     val totalCompletedByUser = MutableLiveData<Int>()
     val isAnonymous = MutableLiveData<Boolean>()
 
     private var displayName = MutableLiveData<String>()
     private var email = MutableLiveData<String>()
     private var uid = MutableLiveData<String>()
-
 
     fun observeDisplayName() : LiveData<String> {
         return displayName
@@ -51,17 +51,29 @@ class MainViewModel: ViewModel() {
         fetchAccepted()
         fetchFavorites()
         fetchTotalCompletedByUser()
+        dbHelp.addUserName(currentUser?.displayName.toString())
+        fetchLeadershipList()
     }
-    fun updateUser(newUsername: String?, newEmail: String?) {
+    fun updateUserName(userName: String, listener: OnCompleteListener<Void>){
         val currentUser = firebaseAuthLiveData.getCurrentUser()
         val profileUpdates =
-            UserProfileChangeRequest.Builder().setDisplayName(newUsername).build()
-        if (newEmail != null) {
-            currentUser?.updateEmail(newEmail)
-        }
-        currentUser?.updateProfile(profileUpdates)
-        updateUser()
+            UserProfileChangeRequest.Builder().setDisplayName(userName).build()
+        currentUser?.updateProfile(profileUpdates)?.addOnCompleteListener(listener)
+        firebaseAuthLiveData.updateUser()
     }
+    fun updateEmail(email: String, listener: OnCompleteListener<Void>) {
+        val currentUser = firebaseAuthLiveData.getCurrentUser()
+        currentUser?.updateEmail(email)?.addOnCompleteListener(listener)
+        firebaseAuthLiveData.updateUser()
+    }
+
+    fun createPermanentAuth(email: String, password: String, listener: OnCompleteListener<AuthResult>) {
+        val currentUser = firebaseAuthLiveData.getCurrentUser()
+        val credential = EmailAuthProvider.getCredential(email, password)
+        currentUser?.linkWithCredential(credential)?.addOnCompleteListener(listener)
+        firebaseAuthLiveData.updateUser()
+    }
+
 
     fun addFavorite(activityKey: String){
         dbHelp.addFavorite(activityKey)
@@ -89,12 +101,20 @@ class MainViewModel: ViewModel() {
         return acceptedList
     }
 
+    fun observeLeaderboardList(): MutableLiveData<MutableList<String>> {
+        return leaderboardList
+    }
+
     fun fetchFavorites() {
         dbHelp.fetchFavorites(favoritesList)
     }
 
     fun fetchAccepted(){
         dbHelp.fetchAccepted(acceptedList)
+    }
+
+    fun fetchLeadershipList() {
+        dbHelp.load(leaderboardList)
     }
 
     fun observeTotalCompletedByUser(): LiveData<Int> {
@@ -127,16 +147,9 @@ class MainViewModel: ViewModel() {
         uid.postValue("")
     }
 
-
-    fun createPermanentAuth(email: String, password: String, listener: OnCompleteListener<AuthResult>) {
-        val currentUser = firebaseAuthLiveData.getCurrentUser()
-        val credential = EmailAuthProvider.getCredential(email, password)
-        currentUser?.linkWithCredential(credential)?.addOnCompleteListener(listener)
-    }
-
     fun fetchIsAnonymous() {
         val currentUser = firebaseAuthLiveData.getCurrentUser()
-        isAnonymous.postValue(currentUser?.isAnonymous ?: true)
+        isAnonymous.postValue(currentUser?.isAnonymous)
     }
 
     fun observeIsAnonymous(): LiveData<Boolean> {

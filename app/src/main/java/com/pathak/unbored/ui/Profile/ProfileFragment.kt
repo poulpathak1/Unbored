@@ -1,17 +1,16 @@
 package com.pathak.unbored.ui.Profile
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
-import com.pathak.unbored.FirestoreAuthLiveData
 import com.pathak.unbored.MainViewModel
 import com.pathak.unbored.databinding.FragmentProfileBinding
 
@@ -23,6 +22,12 @@ class ProfileFragment : Fragment() {
 
     private val viewModel: MainViewModel by viewModels()
 
+    private fun initAdapter(
+        binding: FragmentProfileBinding,
+    ): LeaderboardListAdapter {
+        return LeaderboardListAdapter(viewModel, requireActivity())
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -30,19 +35,19 @@ class ProfileFragment : Fragment() {
     ): View {
 
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
-        val root: View = binding.root
 
-        if (Firebase.auth.currentUser == null){
-            return root
-        }
-
-        return root
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         (requireActivity() as AppCompatActivity).supportActionBar?.title = "Profile"
+
+        binding.leaderboardRV.layoutManager = LinearLayoutManager(binding.leaderboardRV.context)
+
+        val leaderboardAdapter = initAdapter(binding)
+        binding.leaderboardRV.adapter = leaderboardAdapter
 
         viewModel.updateUser()
 
@@ -56,21 +61,31 @@ class ProfileFragment : Fragment() {
             binding.userUid.text = viewModel.observeUid().value
         }
 
+        viewModel.observeLeaderboardList().observe(viewLifecycleOwner) {
+            leaderboardAdapter.submitList(it)
+        }
+
         binding.saveBut.setOnClickListener {
             val newUsername = binding.userName.text.toString().trim()
             val newEmail = binding.userEmail.text.toString().trim()
-            if (FirebaseAuth.getInstance().currentUser?.isAnonymous == true) {
+            if (viewModel.observeIsAnonymous().value == true) {
                 val newPass = binding.userNewPassword.text.toString()
                 val confirmPass = binding.userConfirmPassword.text.toString()
 
-                if(newPass == confirmPass && !newEmail.isNullOrBlank()){
+                if(newPass == confirmPass && newEmail.isNotBlank() && confirmPass.isNotBlank()){
                     viewModel.createPermanentAuth(newEmail, confirmPass) {
                         if (it.isSuccessful) {
-                            Snackbar.make(
-                                view, "Account created Successfully",
-                                Snackbar.LENGTH_LONG
+                            Toast.makeText(
+                                context, "Account created Successfully",
+                                Toast.LENGTH_LONG
                             ).show()
-                            viewModel.updateUser()
+                            if (newUsername.isNotBlank() && newUsername != viewModel.observeDisplayName().value) {
+                                viewModel.updateEmail(newEmail) { task ->
+                                    if (task.isSuccessful) {
+                                        Toast.makeText(context, "UserName Updated!", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            }
                         } else {
                             Snackbar.make(
                                 view, "Bad Request!",
@@ -85,10 +100,31 @@ class ProfileFragment : Fragment() {
                 }
             }
             else {
-                viewModel.updateUser(newUsername, newEmail)
-                Snackbar.make(view, "Update Successful",
-                    Snackbar.LENGTH_LONG).show()
+                if (newUsername.isNotBlank() && newUsername != viewModel.observeDisplayName().value){
+                    viewModel.updateUserName(newUsername) {
+                        if (it.isSuccessful){
+                            Toast.makeText(context, "UserName Updated!", Toast.LENGTH_SHORT).show()
+                            if (newEmail.isNotBlank() && newEmail != viewModel.observeEmail().value) {
+                                viewModel.updateEmail(newEmail) { task ->
+                                    if (task.isSuccessful) {
+                                        Toast.makeText(context, "Email Updated!", Toast.LENGTH_SHORT).show()
+                                    }
+                                    else {
+
+                                    }
+                                }
+                            }
+                        } else {
+
+                        }
+                    }
+                }
+
             }
+        }
+
+        viewModel.observeLeaderboardList().observe(viewLifecycleOwner) {
+            Log.d("DDD", "$it")
         }
 
         viewModel.fetchTotalCompletedByUser()
