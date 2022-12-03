@@ -2,7 +2,6 @@ package com.pathak.unbored.ui.dashboard
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -11,8 +10,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.pathak.unbored.MainViewModel
 import com.pathak.unbored.R
 import com.pathak.unbored.databinding.RowActivityBinding
-import java.lang.reflect.Type
-import kotlin.coroutines.coroutineContext
 
 class ActivityListAdapter(private val mainViewModel: MainViewModel, fragmentActivity: FragmentActivity, private val listType: String):
     ListAdapter<String, ActivityListAdapter.VH>(BoredActivityDiff()){
@@ -36,7 +33,9 @@ class ActivityListAdapter(private val mainViewModel: MainViewModel, fragmentActi
                 rowActivityBinding.acceptBut.setImageResource(R.drawable.ic_baseline_check_circle_24)
                 rowActivityBinding.cancelBut.setImageResource(R.drawable.ic_favorite_border_black_50dp)
                 rowActivityBinding.acceptBut.setOnClickListener {
-                    Snackbar.make(itemView, "Congratulations on completing the activity!", Snackbar.LENGTH_LONG).show()
+                    Snackbar.make(itemView, "Congratulations on completing the activity!",
+                        Snackbar.LENGTH_SHORT).show()
+                    mainViewModel.addTotalCompletedByUser()
                     mainViewModel.removeAccepted(boredActivityKey)
                     notifyDataSetChanged()
                 }

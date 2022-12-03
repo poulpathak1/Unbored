@@ -2,8 +2,6 @@ package com.pathak.unbored.ui.home
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,25 +12,21 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.NavHostFragment
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
+import com.pathak.unbored.FirestoreAuthLiveData
 import com.pathak.unbored.MainViewModel
 import com.pathak.unbored.R
 import com.pathak.unbored.databinding.FragmentHomeBinding
-import com.pathak.unbored.ui.dashboard.DashboardFragment
 
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
     private val homeViewModel: HomeViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by viewModels()
+    private var firebaseAuthLiveData = FirestoreAuthLiveData()
+
 
     private var resultLauncher =
         registerForActivityResult(
@@ -66,7 +60,8 @@ class HomeFragment : Fragment() {
                         homeViewModel.setMaxAccessibility(it)
                     }
                 }
-
+                binding.filterSwitch.isChecked = true
+                binding.filterSwitch.text = "On"
                 homeViewModel.filterActivity()
             } else {
                 Log.w(javaClass.simpleName, "Bad activity return code ${result.resultCode}")
@@ -78,9 +73,6 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-//        val homeViewModel =
-//            ViewModelProvider(this).get(HomeViewModel::class.java)
-
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
         return binding.root
@@ -110,6 +102,14 @@ class HomeFragment : Fragment() {
         binding.filterButton.setOnClickListener {
             doFilter()
         }
+        binding.filterSwitch.setOnClickListener {
+            if (binding.filterSwitch.isChecked){
+                binding.filterSwitch.text = "On"
+            }
+            else {
+                binding.filterSwitch.text = "Off"
+            }
+        }
 
         homeViewModel.observeBoredActivity().observe(viewLifecycleOwner) {
             binding.textHome.text = it.activity
@@ -119,39 +119,45 @@ class HomeFragment : Fragment() {
             mainViewModel.favoritesList.value?.contains(activityKey)
                 ?.let { it1 -> homeViewModel.setIsFavorite(it1) }
         }
-//        homeViewModel.observeIsFavorite().observe(viewLifecycleOwner) {
-//            if (it == true) binding.favoriteBut.setImageResource(R.drawable.ic_favorite_red_24dp)
-//            else binding.favoriteBut.setImageResource(R.drawable.ic_favorite_border_black_50dp)
-//        }
 
         binding.cancelBut.setOnClickListener {
-            homeViewModel.filterActivity()
-        }
-        binding.acceptBut.setOnClickListener {
-            val activityKey = homeViewModel.observeBoredActivity().value?.activity
-            if (Firebase.auth.currentUser == null) {
-                Snackbar.make(view, "Please Login to start", Snackbar.LENGTH_LONG).show()
-            }
-            else if ((mainViewModel.acceptedList.value?.size?:0 < 3) && activityKey != null) {
-                mainViewModel.addAccepted(activityKey)
-                Snackbar.make(view, "New activity has been added to Activity Backlog", Snackbar.LENGTH_LONG).show()
+            if (binding.filterSwitch.isChecked){
                 homeViewModel.filterActivity()
             }
             else {
-                Snackbar.make(view, "Complete an activity from Dashboard first!", Snackbar.LENGTH_LONG).show()
+                homeViewModel.netRefresh()
+            }
+        }
+        binding.acceptBut.setOnClickListener {
+            val activityKey = homeViewModel.observeBoredActivity().value?.activity
+            val currentUser = firebaseAuthLiveData.getCurrentUser()
+            if (currentUser == null) {
+                Snackbar.make(view, "Please Login to start", Snackbar.LENGTH_SHORT).show()
+            }
+            else if (((mainViewModel.acceptedList.value?.size ?: 0) < 3) && activityKey != null) {
+                mainViewModel.addAccepted(activityKey)
+                Snackbar.make(view, "New activity has been added to Activity Backlog",
+                    Snackbar.LENGTH_SHORT).show()
+                if (binding.filterSwitch.isChecked){
+                    homeViewModel.filterActivity()
+                }
+                else {
+                    homeViewModel.netRefresh()
+                }
+            }
+            else {
+                Snackbar.make(view, "Complete an activity from Dashboard first!",
+                    Snackbar.LENGTH_SHORT).show()
             }
         }
         binding.favoriteBut.setOnClickListener {
             val activityKey = homeViewModel.observeBoredActivity().value?.activity
             if(mainViewModel.favoritesList.value?.contains(activityKey) == true){
-                //homeViewModel.setIsFavorite(false)
                 if (activityKey != null) {
                     mainViewModel.removeFavorite(activityKey)
-
                 }
             }
             else{
-                //homeViewModel.setIsFavorite(true)
                 if (activityKey != null){
                     mainViewModel.addFavorite(activityKey)
                 }
@@ -161,13 +167,9 @@ class HomeFragment : Fragment() {
             val activityKey = homeViewModel.observeBoredActivity().value!!.activity
             if(mainViewModel.favoritesList.value?.contains(activityKey) == true){
                 binding.favoriteBut.setImageResource(R.drawable.ic_favorite_red_24dp)
-                //homeViewModel.setIsFavorite(true)
-                //mainViewModel.removeFavorite(activityKey)
             }
             else{
                 binding.favoriteBut.setImageResource(R.drawable.ic_favorite_border_black_50dp)
-                //homeViewModel.setIsFavorite(false)
-                //mainViewModel.addFavorite(activityKey)
             }
         }
     }

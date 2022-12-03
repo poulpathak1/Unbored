@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.pathak.unbored.MainViewModel
@@ -22,16 +21,11 @@ class DashboardFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    companion object {
-        fun newInstance(): DashboardFragment {
-            return DashboardFragment()
-        }
-    }
-
-    private fun initAdapter(binding: FragmentDashboardBinding, listType: String) : ActivityListAdapter {
-        val adapter = ActivityListAdapter(mainViewModel, this.requireActivity(), listType)
-        //binding.favoritesRV.adapter = adapter
-        return adapter
+    private fun initAdapter(
+        binding: FragmentDashboardBinding,
+        listType: String
+    ): ActivityListAdapter {
+        return ActivityListAdapter(mainViewModel, requireActivity(), listType)
     }
 
     override fun onCreateView(
@@ -61,6 +55,7 @@ class DashboardFragment : Fragment() {
 
         mainViewModel.fetchFavorites()
         mainViewModel.fetchAccepted()
+        mainViewModel.fetchTotalCompletedByUser()
         mainViewModel.observeAcceptedList().observe(viewLifecycleOwner) {
             acceptedAdapter.submitList(mainViewModel.observeAcceptedList().value)
         }

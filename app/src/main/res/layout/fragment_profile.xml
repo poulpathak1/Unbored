@@ -15,56 +15,140 @@
         app:layout_constraintTop_toTopOf="parent">
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingVertical="12dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:textSize="16sp"
                 android:text="UserName"/>
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:text="Empty"
-                android:id="@+id/userName"/>
+                android:textSize="16sp"
+                android:maxLength="20"
+                android:gravity="end"
+                android:id="@+id/userName"
+                android:inputType="text"
+                android:autofillHints="username" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingVertical="12dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:textSize="16sp"
                 android:text="Email"/>
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:text="Empty"
-                android:id="@+id/userEmail"/>
+                android:gravity="end"
+                android:textSize="16sp"
+                android:maxLength="30"
+                android:id="@+id/userEmail"
+                android:inputType="textEmailAddress"
+                android:autofillHints="emailAddress" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingVertical="12dp"
+            android:visibility="gone"
+            android:id="@+id/newPasswordLayout">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:textSize="16sp"
+                android:text="New Password"/>
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:gravity="end"
+                android:textSize="16sp"
+                android:maxLength="20"
+                android:inputType="textPassword"
+                android:id="@+id/userNewPassword"
+                android:autofillHints="password" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="12dp"
+            android:visibility="gone"
+            android:id="@+id/confirmPasswordLayout">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:maxLength="20"
+                android:text="Confirm Password"/>
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:gravity="end"
+                android:textSize="16sp"
+                android:inputType="textPassword"
+                android:id="@+id/userConfirmPassword"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="12dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
                 android:text="UID"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:text="Empty"
+                android:gravity="end"
+                android:textSize="16sp"
                 android:id="@+id/userUid"/>
         </LinearLayout>
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingVertical="12dp"
             android:text="Save"
             android:id="@+id/saveBut"/>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="36dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="24sp"
+                android:gravity="center"
+                android:text="0"
+                android:id="@+id/userTotalCompletedByUser"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:textSize="24sp"
+                android:text="Activities Completed"/>
+        </LinearLayout>
 <!--        <Button-->
 <!--            android:layout_width="match_parent"-->
 <!--            android:layout_height="wrap_content"-->

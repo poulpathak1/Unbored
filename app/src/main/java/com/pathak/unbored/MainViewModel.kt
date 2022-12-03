@@ -1,15 +1,13 @@
 package com.pathak.unbored
 
-import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.UserInfo
 import com.google.firebase.auth.UserProfileChangeRequest
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
-import com.pathak.unbored.api.BoredActivity
-import okhttp3.internal.notify
 
 class MainViewModel: ViewModel() {
 
@@ -17,23 +15,53 @@ class MainViewModel: ViewModel() {
     private val dbHelp = ViewModelDBHelper()
     val favoritesList = MutableLiveData<MutableList<String>>()
     val acceptedList = MutableLiveData<MutableList<String>>()
+    val totalCompletedByUser = MutableLiveData<Int>()
+    val isAnonymous = MutableLiveData<Boolean>()
 
+    private var displayName = MutableLiveData<String>()
+    private var email = MutableLiveData<String>()
+    private var uid = MutableLiveData<String>()
+
+
+    fun observeDisplayName() : LiveData<String> {
+        return displayName
+    }
+    fun observeEmail() : LiveData<String> {
+        return email
+    }
+    fun observeUid() : LiveData<String> {
+        return uid
+    }
 
     fun updateUser() {
         firebaseAuthLiveData.updateUser()
+
+        val currentUser = firebaseAuthLiveData.getCurrentUser()
+
+        displayName.postValue(currentUser?.displayName ?: "")
+        email.postValue(currentUser?.email ?: "")
+        uid.postValue(currentUser?.uid ?: "")
+
+        if (currentUser?.displayName.isNullOrBlank()){
+            val profileUpdates =
+                UserProfileChangeRequest.Builder().setDisplayName("Anonymous User").build()
+            currentUser?.updateProfile(profileUpdates)
+        }
+        fetchIsAnonymous()
         fetchAccepted()
         fetchFavorites()
+        fetchTotalCompletedByUser()
     }
     fun updateUser(newUsername: String?, newEmail: String?) {
-        val user = FirebaseAuth.getInstance().currentUser
+        val currentUser = firebaseAuthLiveData.getCurrentUser()
         val profileUpdates =
             UserProfileChangeRequest.Builder().setDisplayName(newUsername).build()
         if (newEmail != null) {
-            user?.updateEmail(newEmail)
+            currentUser?.updateEmail(newEmail)
         }
-        user?.updateProfile(profileUpdates)
+        currentUser?.updateProfile(profileUpdates)
+        updateUser()
     }
-
 
     fun addFavorite(activityKey: String){
         dbHelp.addFavorite(activityKey)
@@ -43,7 +71,6 @@ class MainViewModel: ViewModel() {
     fun removeFavorite(activityKey: String) {
         dbHelp.removeFavorite(favoritesList, activityKey)
     }
-
 
     fun addAccepted(activityKey: String) {
         dbHelp.addAccepted(activityKey)
@@ -70,24 +97,51 @@ class MainViewModel: ViewModel() {
         dbHelp.fetchAccepted(acceptedList)
     }
 
-    fun signOut() {
-        Firebase.auth.signOut()
-        FirebaseAuth.getInstance().signOut()
-        userLogOut()
+    fun observeTotalCompletedByUser(): LiveData<Int> {
+        return totalCompletedByUser
+    }
 
-        //userLogout()
+    fun addTotalCompletedByUser(){
+        dbHelp.addTotalCompletedByUser()
+        fetchTotalCompletedByUser()
+    }
+
+    fun fetchTotalCompletedByUser() {
+        dbHelp.fetchTotalCompletedByUser(totalCompletedByUser)
+    }
+
+    fun signOut() {
+        userLogOut()
+        //Firebase.auth.signOut()
+        FirebaseAuth.getInstance().signOut()
+        firebaseAuthLiveData.updateUser()
+        FirestoreAuthLiveData().updateUser()
+        updateUser()
     }
 
     private fun userLogOut() {
         favoritesList.postValue(emptyList<String>().toMutableList())
         acceptedList.postValue(emptyList<String>().toMutableList())
+        displayName.postValue("")
+        email.postValue("")
+        uid.postValue("")
     }
 
-    fun isFavorite(boredActivity: BoredActivity): Boolean {
-        return observeFavoritesList().value?.contains(boredActivity.key) ?: false
+
+    fun createPermanentAuth(email: String, password: String, listener: OnCompleteListener<AuthResult>) {
+        val currentUser = firebaseAuthLiveData.getCurrentUser()
+        val credential = EmailAuthProvider.getCredential(email, password)
+        currentUser?.linkWithCredential(credential)?.addOnCompleteListener(listener)
     }
 
+    fun fetchIsAnonymous() {
+        val currentUser = firebaseAuthLiveData.getCurrentUser()
+        isAnonymous.postValue(currentUser?.isAnonymous ?: true)
+    }
 
+    fun observeIsAnonymous(): LiveData<Boolean> {
+        return isAnonymous
+    }
 
 
 }

@@ -1,62 +1,64 @@
 package com.pathak.unbored
 
-import android.util.Log
-import android.view.View
 import androidx.lifecycle.MutableLiveData
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.SetOptions
-import okhttp3.internal.notifyAll
 
 class ViewModelDBHelper() {
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val rootCollection = "users"
-    private val cu = FirestoreAuthLiveData().getCurrentUser()
+    private val leaderboardCollection = "leaderboard"
+    private val favActivityList = "favActivityList"
+    private val acceptedActivityList = "acceptedActivityList"
+    private val totalCompletedByUser = "totalCompletedByUser"
+    private val scoresDocument = "scores"
+    private var firebaseAuthLiveData = FirestoreAuthLiveData()
+    private val cu = firebaseAuthLiveData.getCurrentUser()
 
-    fun addFavorite(activityKey: String){
-        //Log.d("PPP", "addFavorite: ${cu!!.uid}")
-        if (cu == null){
-            Log.d("PPP", "cu is Null")
-        }
-        else{
+    fun addToLeaderBoard(userName: String, score: Number) {
+        db.collection(leaderboardCollection).document()
+    }
+
+    fun addFavorite(activityKey: String) {
+        if (cu != null) {
+
             db.collection(rootCollection).document(cu.uid).update(
-                "favActivityKeys", FieldValue.arrayUnion(activityKey)
+                favActivityList, FieldValue.arrayUnion(activityKey)
             )
                 .addOnSuccessListener {
-                    Log.d("PPP", "addFavorite: successful")
+                    //Log.d("PPP", "addFavorite: successful")
                 }
                 .addOnFailureListener {
-                    val setFav = mapOf(Pair("favActivityKeys", arrayListOf(activityKey)))
+                    val setFav = mapOf(Pair(favActivityList, arrayListOf(activityKey)))
                     db.collection(rootCollection).document(cu.uid).set(setFav)
                 }
-//        db.collection(rootCollection).document(cu!!.uid).update(
-//            "favActivityKeys", FieldValue.arrayUnion(activityKey))
         }
 
     }
 
-    fun removeFavorite(favoritesList: MutableLiveData<MutableList<String>>,
-                       activityKey: String) {
+    fun removeFavorite(
+        favoritesList: MutableLiveData<MutableList<String>>,
+        activityKey: String
+    ) {
 
         favoritesList.value?.remove(activityKey)
         favoritesList.postValue(favoritesList.value)
-        db.collection(rootCollection).document(cu!!.uid).update("favActivityKeys", favoritesList.value)
+        db.collection(rootCollection).document(cu!!.uid)
+            .update(favActivityList, favoritesList.value)
     }
 
     fun addAccepted(activityKey: String) {
         if (cu == null) {
-            Log.d("PPP", "cu is Null")
+            //Log.d("PPP", "cu is Null")
         } else {
             db.collection(rootCollection).document(cu.uid).update(
-                "acceptedActivityKeys", FieldValue.arrayUnion(activityKey)
+                acceptedActivityList, FieldValue.arrayUnion(activityKey)
             )
                 .addOnSuccessListener {
-                    Log.d("PPP", "addFavorite: successful")
+                    //Log.d("PPP", "addFavorite: successful")
                 }
                 .addOnFailureListener {
-                    val newKey = mapOf(Pair("acceptedActivityKeys", arrayListOf(activityKey)))
+                    val newKey = mapOf(Pair(acceptedActivityList, arrayListOf(activityKey)))
                     db.collection(rootCollection).document(cu.uid).set(newKey)
                 }
         }
@@ -67,9 +69,9 @@ class ViewModelDBHelper() {
         boredActivityKey: String
     ) {
         acceptedList.value?.remove(boredActivityKey)
-        db.collection(rootCollection).document(cu!!.uid).update("acceptedActivityKeys", acceptedList.value)
+        db.collection(rootCollection).document(cu!!.uid)
+            .update(acceptedActivityList, acceptedList.value)
     }
-
 
 
     fun fetchFavorites(favoritesList: MutableLiveData<MutableList<String>>) {
@@ -78,8 +80,8 @@ class ViewModelDBHelper() {
             db.collection(rootCollection).document(it.uid)
                 .get()
                 .addOnSuccessListener {
-                    val result = it.data?.get("favActivityKeys") ?: null
-                    if (result != null){
+                    val result = it.data?.get(favActivityList)
+                    if (result != null) {
                         x = result as MutableList<String>
                     }
                     favoritesList.postValue(x)
@@ -96,7 +98,7 @@ class ViewModelDBHelper() {
             db.collection(rootCollection).document(it.uid)
                 .get()
                 .addOnSuccessListener {
-                    val result = it.data?.get("acceptedActivityKeys") ?: null
+                    val result = it.data?.get(acceptedActivityList)
                     if (result != null) {
                         x = result as MutableList<String>
                     }
@@ -108,33 +110,39 @@ class ViewModelDBHelper() {
         }
     }
 
+    fun addTotalCompletedByUser() {
+        if (cu != null) {
+            db.collection(rootCollection).document(cu.uid).update(
+                totalCompletedByUser, FieldValue.increment(1)
+            )
+                .addOnSuccessListener {
 
+                }
+                .addOnFailureListener {
+                    val newKey = mapOf(Pair(totalCompletedByUser, 1))
+                    db.collection(rootCollection).document(cu.uid).set(newKey)
+                }
+        }
+    }
 
-//    fun fetchPhotoMeta(sortInfo: SortInfo,
-//                       notesList: MutableLiveData<List<PhotoMeta>>) {
-//        dbFetchPhotoMeta(sortInfo, notesList)
-//    }
-    // If we want to listen for real time updates use this
-    // .addSnapshotListener { querySnapshot, firebaseFirestoreException ->
-    // But be careful about how listener updates live data
-    // and noteListener?.remove() in onCleared
-//    private fun limitAndGet(query: Query,
-//                            notesList: MutableLiveData<List<PhotoMeta>>) {
-//        query
-//            .limit(100)
-//            .get()
-//            .addOnSuccessListener { result ->
-//                Log.d(javaClass.simpleName, "allNotes fetch ${result!!.documents.size}")
-//                // NB: This is done on a background thread
-//                notesList.postValue(result.documents.mapNotNull {
-//                    it.toObject(PhotoMeta::class.java)
-//                })
-//            }
-//            .addOnFailureListener {
-//                Log.d(javaClass.simpleName, "allNotes fetch FAILED ", it)
-//            }
-//    }
-    /////////////////////////////////////////////////////////////
+    fun fetchTotalCompletedByUser(totalCompletedByUser: MutableLiveData<Int>) {
+        var x: Long = 0
+        cu?.let {
+            db.collection(rootCollection).document(it.uid)
+                .get()
+                .addOnSuccessListener {
+                    val result = it.data?.get(this.totalCompletedByUser)
+                    if (result != null) {
+                        x = result as Long
+                    }
+                    totalCompletedByUser.postValue(x.toInt())
+                }
+                .addOnFailureListener {
+
+                }
+        }
+    }
+}
 
 
     // Interact with Firestore db
@@ -179,22 +187,3 @@ class ViewModelDBHelper() {
 //            }
 //    }
 
-    // https://firebase.google.com/docs/firestore/manage-data/delete-data#delete_documents
-//    fun removePhotoMeta(
-//        sortInfo: SortInfo,
-//        photoMeta: PhotoMeta,
-//        photoMetaList: MutableLiveData<List<PhotoMeta>>
-//    ) {
-//        // XXX Write me.  Make sure you delete the correct entry
-//        db.collection(rootCollection)
-//            .document(photoMeta.firestoreID)
-//            .delete()
-//            .addOnSuccessListener {
-//                Log.d(
-//                    javaClass.simpleName,
-//                    "Note delete \"${(photoMeta.uuid)}\" id: ${photoMeta.firestoreID}"
-//                )
-//                dbFetchPhotoMeta(sortInfo, photoMetaList)
-//            }
-//    }
-}

@@ -1,12 +1,10 @@
 package com.pathak.unbored.ui.home
 
 import android.util.Log
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pathak.unbored.MainViewModel
 import com.pathak.unbored.api.BoredActivity
 import com.pathak.unbored.api.BoredApi
 import com.pathak.unbored.api.Repository
@@ -58,13 +56,6 @@ class HomeViewModel : ViewModel() {
                 maxAccessibility.value ?: 1.0f
             ))
         }
-    }
-
-    fun updateAttributes(){
-        setType(boredActivity.value?.type ?: "social")
-        setParticipants(boredActivity.value?.participants ?: 1.0f)
-        setPrice(boredActivity.value?.price ?: 0.0f)
-        setAccessibility(boredActivity.value?.accessibility ?: 0.0f)
     }
 
     fun observeBoredActivity(): LiveData<BoredActivity> {
@@ -128,9 +119,7 @@ class HomeViewModel : ViewModel() {
     fun setIsFavorite(favoriteStatus: Boolean) {
         this.isFavorite.postValue(favoriteStatus)
     }
-    fun observeIsFavorite(): MutableLiveData<Boolean> {
-        return isFavorite
-    }
+
 
 
 }
