@@ -68,9 +68,8 @@ class FilterActivity : AppCompatActivity() {
         filterLayout.accessibilitySlider.values[0] = callingBundle.getFloat(minAccessibilityKey)
         filterLayout.accessibilitySlider.values[1] = callingBundle.getFloat(maxAccessibilityKey)
 
-        filterLayout.priceLabel.text = "Price : ${callingBundle.getFloat(priceKey)}"
-        filterLayout.accessibilityLabel.text = "Accessibility : ${callingBundle.getFloat(
-            accessibilityKey)}"
+        filterLayout.priceLabel.text = "Price : "
+        filterLayout.accessibilityLabel.text = "Accessibility : "
     }
 
     private fun sendFilters(){
