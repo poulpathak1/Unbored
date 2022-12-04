@@ -1,7 +1,6 @@
 package com.pathak.unbored.ui.Profile
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.snackbar.Snackbar
 import com.pathak.unbored.MainViewModel
 import com.pathak.unbored.databinding.FragmentProfileBinding
 
@@ -72,59 +70,55 @@ class ProfileFragment : Fragment() {
                 val newPass = binding.userNewPassword.text.toString()
                 val confirmPass = binding.userConfirmPassword.text.toString()
 
-                if(newPass == confirmPass && newEmail.isNotBlank() && confirmPass.isNotBlank()){
+                if (newPass == confirmPass && newEmail.isNotBlank() && confirmPass.isNotBlank()) {
                     viewModel.createPermanentAuth(newEmail, confirmPass) {
                         if (it.isSuccessful) {
-                            Toast.makeText(
-                                context, "Account created Successfully",
-                                Toast.LENGTH_LONG
-                            ).show()
+                            toastNow("Account created Successfully")
                             if (newUsername.isNotBlank() && newUsername != viewModel.observeDisplayName().value) {
-                                viewModel.updateEmail(newEmail) { task ->
+                                viewModel.updateUserName(newUsername) { task ->
                                     if (task.isSuccessful) {
-                                        Toast.makeText(context, "UserName Updated!", Toast.LENGTH_SHORT).show()
+                                        toastNow("UserName Updated!")
+                                    } else {
+                                        toastNow("Check username")
                                     }
                                 }
                             }
                         } else {
-                            Snackbar.make(
-                                view, "Bad Request!",
-                                Snackbar.LENGTH_LONG
-                            ).show()
+                            toastNow("Bad Request!")
                         }
                     }
+                } else {
+                    toastNow("Please check email or password")
                 }
-                else{
-                    Snackbar.make(view, "Please check email and password",
-                        Snackbar.LENGTH_LONG).show()
-                }
-            }
-            else {
-                if (newUsername.isNotBlank() && newUsername != viewModel.observeDisplayName().value){
+            } else {
+                if (newUsername.isNotBlank() && newUsername != viewModel.observeDisplayName().value) {
                     viewModel.updateUserName(newUsername) {
-                        if (it.isSuccessful){
-                            Toast.makeText(context, "UserName Updated!", Toast.LENGTH_SHORT).show()
+                        if (it.isSuccessful) {
+                            toastNow("UserName Updated!")
                             if (newEmail.isNotBlank() && newEmail != viewModel.observeEmail().value) {
                                 viewModel.updateEmail(newEmail) { task ->
                                     if (task.isSuccessful) {
-                                        Toast.makeText(context, "Email Updated!", Toast.LENGTH_SHORT).show()
-                                    }
-                                    else {
-
+                                        toastNow("Email Updated!")
+                                    } else {
+                                        toastNow("Check email input")
                                     }
                                 }
                             }
                         } else {
-
+                            toastNow("Check username")
+                        }
+                    }
+                } else if (newEmail.isNotBlank() && newEmail != viewModel.observeEmail().value) {
+                    viewModel.updateEmail(newEmail) { task ->
+                        if (task.isSuccessful) {
+                            toastNow("Email Updated!")
+                        } else {
+                            toastNow("Check email")
                         }
                     }
                 }
 
             }
-        }
-
-        viewModel.observeLeaderboardList().observe(viewLifecycleOwner) {
-            Log.d("DDD", "$it")
         }
 
         viewModel.fetchTotalCompletedByUser()
@@ -145,6 +139,10 @@ class ProfileFragment : Fragment() {
             }
         }
 
+    }
+
+    fun toastNow(message: String){
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {

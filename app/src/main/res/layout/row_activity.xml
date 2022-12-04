@@ -5,21 +5,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:focusable="true"
     android:clickable="true"
-    android:layout_margin="8dp"
+    android:layout_margin="1dp"
+    app:cardCornerRadius="10dp"
     app:cardBackgroundColor="@color/colorPrimary"
     android:background="?android:attr/selectableItemBackground">
     <LinearLayout
+        android:id="@+id/rowActivityLL"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:background="@drawable/color_unbored_card_gradient">
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             >
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="10"
@@ -32,6 +35,7 @@
             <LinearLayout
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="end"
                 android:orientation="horizontal">
                 <ImageView

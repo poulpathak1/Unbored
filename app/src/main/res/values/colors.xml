@@ -11,4 +11,14 @@
     <color name="colorSecondary">#DFD9CF</color>
     <color name="darkGrey">#7F808E</color>
     <color name="lightGrey">#9FA0B1</color>
+    <color name="education">#e3342f</color>
+    <color name="recreational">#f6993f</color>
+    <color name="social">#ffed4a</color>
+    <color name="diy">#38c172</color>
+    <color name="charity">#f66d9b</color>
+    <color name="cooking">#3490dc</color>
+    <color name="relaxation">#6574cd</color>
+    <color name="music">#9561e2</color>
+    <color name="busywork">#4dc0b5</color>
+
 </resources>

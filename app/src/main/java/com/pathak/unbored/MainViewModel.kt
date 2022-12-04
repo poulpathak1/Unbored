@@ -1,5 +1,7 @@
 package com.pathak.unbored
 
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -155,6 +157,33 @@ class MainViewModel: ViewModel() {
     fun observeIsAnonymous(): LiveData<Boolean> {
         return isAnonymous
     }
+
+    fun getGD(type: String): GradientDrawable {
+        val colorMap = hashMapOf(
+            "education" to Color.valueOf(0xE3342F).hashCode() ,
+            "recreational" to Color.valueOf(0xf6993f).hashCode(),
+            "social" to Color.valueOf(0xffed4a).hashCode(),
+            "diy" to Color.valueOf(0x38c172).hashCode(),
+            "charity" to Color.valueOf(0xf66d9b).hashCode(),
+            "cooking" to Color.valueOf(0x3490dc).hashCode(),
+            "relaxation" to Color.valueOf(0x6574cd).hashCode(),
+            "music" to Color.valueOf(0x9561e2).hashCode(),
+            "busywork" to Color.valueOf(0x4dc0b5).hashCode()
+        )
+
+        if (type.isNullOrBlank()) return GradientDrawable(
+            GradientDrawable.Orientation.TL_BR,
+            intArrayOf(Color.CYAN, Color.LTGRAY)
+        )
+
+        var gd = GradientDrawable(
+            GradientDrawable.Orientation.TL_BR,
+            colorMap[type]?.let { intArrayOf(it, it, Color.LTGRAY) }
+        )
+        gd.cornerRadius = 2.0f
+        return gd
+    }
+
 
 
 }

@@ -49,7 +49,7 @@ class ActivityListAdapter(private val mainViewModel: MainViewModel, fragmentActi
                 rowActivityBinding.acceptBut.setImageResource(R.drawable.ic_baseline_move_24)
                 rowActivityBinding.cancelBut.setImageResource(R.drawable.ic_baseline_cancel_24)
                 rowActivityBinding.acceptBut.setOnClickListener {
-                    if(mainViewModel.observeAcceptedList().value?.size ?: 0 < 3){
+                    if((mainViewModel.observeAcceptedList().value?.size ?: 0) < 3){
                         mainViewModel.addAccepted(boredActivityKey)
                         mainViewModel.removeFavorite(boredActivityKey)
                         notifyDataSetChanged()

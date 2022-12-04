@@ -2,9 +2,12 @@ package com.pathak.unbored.ui.home
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -93,10 +96,11 @@ class HomeFragment : Fragment() {
         resultLauncher.launch(getFilterIntent)
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        (requireActivity() as AppCompatActivity).supportActionBar?.title = "Activity"
+        (requireActivity() as AppCompatActivity).supportActionBar?.title = "Home"
 
 
         binding.filterButton.setOnClickListener {
@@ -113,6 +117,13 @@ class HomeFragment : Fragment() {
 
         homeViewModel.observeBoredActivity().observe(viewLifecycleOwner) {
             binding.textHome.text = it.activity
+            binding.numParticipants.text = it.participants.toInt().toString()
+
+
+
+            if (!it.type.isNullOrBlank()) {
+                binding.activityLL.background = mainViewModel.getGD(it.type)
+            }
             if (it.activity.isNullOrBlank()) binding.textHome.text = "No results found!"
             mainViewModel.fetchFavorites()
             val activityKey = homeViewModel.observeBoredActivity().value!!.key
@@ -121,20 +132,26 @@ class HomeFragment : Fragment() {
         }
 
         binding.cancelBut.setOnClickListener {
+            binding.cancelBut.animate().alpha(1f).duration = 1000
             if (binding.filterSwitch.isChecked){
                 homeViewModel.filterActivity()
             }
             else {
                 homeViewModel.netRefresh()
             }
+            binding.cancelBut.alpha = 0f
         }
+
+
         binding.acceptBut.setOnClickListener {
             val activityKey = homeViewModel.observeBoredActivity().value?.activity
             val currentUser = firebaseAuthLiveData.getCurrentUser()
             if (currentUser == null) {
                 Toast.makeText(context, "Please Login to start", Toast.LENGTH_SHORT).show()
             }
-            else if ((mainViewModel.observeAcceptedList().value?.size ?: 0 < 3) && activityKey != null) {
+            else if (((mainViewModel.observeAcceptedList().value?.size
+                    ?: 0) < 3) && activityKey != null
+            ) {
                 mainViewModel.addAccepted(activityKey)
                 Toast.makeText(context, "New activity has been added to Activity Backlog",
                     Toast.LENGTH_SHORT).show()
@@ -150,6 +167,7 @@ class HomeFragment : Fragment() {
                     Toast.LENGTH_SHORT).show()
             }
         }
+
         binding.favoriteBut.setOnClickListener {
             val activityKey = homeViewModel.observeBoredActivity().value?.activity
             if(mainViewModel.favoritesList.value?.contains(activityKey) == true){

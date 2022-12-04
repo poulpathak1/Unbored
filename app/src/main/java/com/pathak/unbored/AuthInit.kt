@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.UserProfileChangeRequest
 
 // https://firebase.google.com/docs/auth/android/firebaseui
 class AuthInit(viewModel: MainViewModel, signInLauncher: ActivityResultLauncher<Intent>) {
@@ -32,7 +31,7 @@ class AuthInit(viewModel: MainViewModel, signInLauncher: ActivityResultLauncher<
                 .enableAnonymousUsersAutoUpgrade()
                 .setAvailableProviders(providers)
                 .setIsSmartLockEnabled(false)
-                .setLogo(R.drawable.ic_baseline_check_circle_24)
+                .setLogo(R.mipmap.app_logo)
                 .build()
             signInLauncher.launch(signInIntent)
         } else {
